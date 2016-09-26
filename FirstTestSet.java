@@ -6,6 +6,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class FirstTestSet {
 	WebDriver browser;
@@ -35,14 +37,16 @@ public class FirstTestSet {
 		WebElement input = browser.findElement(By.id("lst-ib"));
 		input.sendKeys("SoftServe");
 		
-		Thread.sleep(1000);
-		
+		WebDriverWait wait = new WebDriverWait(browser, 10);
+		wait.until(ExpectedConditions.presenceOfElementLocated(By.partialLinkText("SoftServe")));
+			
 		WebElement link = browser.findElement(By.partialLinkText("SoftServe"));
 		String linkText = link.getText();
-	
+		System.out.println(linkText);
+		
 		Assert.assertTrue(linkText.contains("SoftServe"));
 	}
-	
+		
 	@After
 	public void CloseChrome() {
 		browser.close();
