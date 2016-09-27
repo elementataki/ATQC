@@ -1,0 +1,120 @@
+import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import CommentsPages.MainPage;
+import CommentsPages.NewCommentsPage;
+
+public class NewCommentsTesting {
+	WebDriver browser;
+	
+	@Before
+	public void OpenChrome() {
+		System.setProperty("webdriver.chrome.driver", "D:/Selenium/chromedriver.exe");
+		browser = new ChromeDriver();
+	}
+
+	@Test
+	public void test() {
+		browser.get("http://comments.azurewebsites.net/");
+		
+		MainPage commentsPage = new MainPage(browser);
+		
+		commentsPage.clickNewButton();
+		
+		NewCommentsPage newCommentsPage = new NewCommentsPage(browser);
+		
+		newCommentsPage.fillRequiredFields("alfaTest", "196");
+		newCommentsPage.selectAllCategories();
+		newCommentsPage.clickSaveReturn();
+		
+		Assert.assertTrue(commentsPage.findCommentInGrid("alfaTest"));
+	}
+	
+	@After
+	public void CloseChrome() {
+		browser.close();
+	}
+
+}
+
+
+package CommentsPages;
+
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+public class MainPage {
+	private WebDriver browser;
+	
+	private WebElement newButton;
+	private WebElement grid;
+	
+	public MainPage(WebDriver browser) {
+		this.browser = browser;
+	}
+	
+	public void clickNewButton() {
+		newButton = browser.findElement(By.cssSelector("[value='New...']"));
+		newButton.click();
+	}
+
+	public boolean findCommentInGrid(String expectedComment) {
+		boolean found = false;
+		
+		grid = browser.findElement(By.cssSelector(".webgrid"));
+		
+		List<WebElement> textColumns = grid.findElements(By.cssSelector(".textcolumn"));
+		
+		for (WebElement column : textColumns) {
+			if(column.getText().equals(expectedComment)) {
+			found = true;
+			}
+		}
+					
+		return found;
+	}
+}
+
+package CommentsPages;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+public class NewCommentsPage {
+	private WebDriver browser;
+	
+	private WebElement commentText;
+	private WebElement number;
+	private WebElement allCategoriesButton;
+	private WebElement saveAndReturnButton;
+	
+	public NewCommentsPage(WebDriver browser) {
+		this.browser = browser;
+		
+		commentText = browser.findElement(By.id("Text"));
+		number = browser.findElement(By.id("Number"));
+		allCategoriesButton = browser.findElement(By.name("AllSelect"));
+		saveAndReturnButton = browser.findElement(By.cssSelector("[value='Save & Return']"));
+	}
+
+	public void fillRequiredFields(String commentText, String number) {
+		this.commentText.sendKeys(commentText);
+		this.number.sendKeys(number);			
+	}
+
+	public void selectAllCategories() {
+		allCategoriesButton.click();				
+	}
+
+	public void clickSaveReturn() {
+		saveAndReturnButton.click();				
+	}
+
+}
