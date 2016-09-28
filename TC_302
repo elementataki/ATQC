@@ -1,0 +1,89 @@
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import CommentsPages.NewCommentPage;
+
+public class TC_302 {
+	WebDriver browser;
+	
+	@Before
+	public void OpenChrome() {
+		System.setProperty("webdriver.chrome.driver", "C:/selenium/chromedriver.exe");
+		browser = new ChromeDriver();
+		browser.manage().window().maximize();
+	}
+		
+	@Test
+	public void test() {
+		browser.get("http://comments.azurewebsites.net/Editor/NewComment");
+	
+		NewCommentPage newCommentPage = new NewCommentPage(browser);
+	
+		newCommentPage.fillInputFields("TestComment1", "111");
+		newCommentPage.clickAllSelectButton();
+		newCommentPage.clickSaveButton();
+		
+		Assert.assertTrue(newCommentPage.isCommentTextEmpty());
+	}
+
+	@After
+	public void CloseChrome() {
+		browser.close();
+	}
+}
+
+
+
+package CommentsPages;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+public class NewCommentPage {
+	private WebDriver browser;
+
+	public NewCommentPage(WebDriver browser) {
+		this.browser = browser;
+	}
+
+	private WebElement getCommentText() {
+		return browser.findElement(By.id("Text"));
+	}
+
+	private WebElement getNumber() {
+		return browser.findElement(By.id("Number"));
+	}
+
+	private WebElement getAllSelectButton() {
+		return browser.findElement(By.name("AllSelect"));
+	}
+
+	private WebElement getSaveButton() {
+		return browser.findElement(By.cssSelector("[value='Save']"));
+	}
+
+	public void fillInputFields(String commentText, String number) {
+		getCommentText().sendKeys(commentText);
+		getNumber().sendKeys(number);
+	}
+
+	public void clickAllSelectButton() {
+		getAllSelectButton().click();
+	}
+
+	public void clickSaveButton() {
+		getSaveButton().click();
+	}
+
+	public boolean isCommentTextEmpty() {
+		if(getCommentText().getText().equals("")) {
+			return true;
+		}
+		return false;
+	}
+}
