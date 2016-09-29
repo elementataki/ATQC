@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
+import CommentsPages.CommentsPage;
 import CommentsPages.NewCommentPage;
 
 public class TC_302 {
@@ -21,15 +22,30 @@ public class TC_302 {
 	public void test() {
 		browser.get("http://comments.azurewebsites.net/Editor/NewComment");
 	
+		CommentsPage commentsPage = new CommentsPage(browser);
+		
 		NewCommentPage newCommentPage = new NewCommentPage(browser);
 	
-		newCommentPage.fillInputFields("TestComment1", "111");
+		newCommentPage.init();
+		newCommentPage.fillInputFields("1TestComment", "111");
 		newCommentPage.clickAllSelectButton();
 		newCommentPage.clickSaveButton();
-		
+		newCommentPage.init();
+				
 		Assert.assertTrue(newCommentPage.isCommentTextEmpty());
+		Assert.assertTrue(newCommentPage.isNumberEmpty());
+		Assert.assertTrue(newCommentPage.selectedCategoriesIsEmpty());
+		Assert.assertTrue(newCommentPage.isActiveSelected());
+		
+		newCommentPage.fillInputFields("2TestComment", "222");
+		newCommentPage.clickAllSelectButton();
+		newCommentPage.clickSaveAndReturnButton();
+		
+		Assert.assertTrue(commentsPage.openPage());
+		Assert.assertTrue(commentsPage.findCommentInTable("1TestComment"));
+		Assert.assertTrue(commentsPage.findCommentInTable("2TestComment"));
 	}
-
+	
 	@After
 	public void CloseChrome() {
 		browser.close();
@@ -40,6 +56,8 @@ public class TC_302 {
 
 package CommentsPages;
 
+import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -47,11 +65,31 @@ import org.openqa.selenium.WebElement;
 public class NewCommentPage {
 	private WebDriver browser;
 
+	private WebElement commentText;
+	private WebElement number;
+	private WebElement active;
+	private WebElement allSelectButton;
+	private WebElement saveButton;
+	private WebElement saveAndReturnButton;
+	private WebElement selectedCategories;
+	private List<WebElement> listOfSelectedCategories;
+	
 	public NewCommentPage(WebDriver browser) {
 		this.browser = browser;
 	}
-
-	private WebElement getCommentText() {
+	
+	public void init() {
+		commentText = browser.findElement(By.id("Text"));
+		number = browser.findElement(By.id("Number"));
+		active = browser.findElement(By.id("Active"));
+		allSelectButton = browser.findElement(By.name("AllSelect"));
+		saveButton = browser.findElement(By.cssSelector("[value='Save']"));
+		saveAndReturnButton = browser.findElement(By.cssSelector("[value= 'Save & Return']"));
+		selectedCategories = browser.findElement(By.id("selectedCategories"));
+		listOfSelectedCategories = selectedCategories.findElements(By.xpath("//div[@id='selectedCategories']/div"));
+	}
+	
+	/*private WebElement getCommentText() {
 		return browser.findElement(By.id("Text"));
 	}
 
@@ -65,25 +103,88 @@ public class NewCommentPage {
 
 	private WebElement getSaveButton() {
 		return browser.findElement(By.cssSelector("[value='Save']"));
-	}
+	}*/
 
 	public void fillInputFields(String commentText, String number) {
-		getCommentText().sendKeys(commentText);
-		getNumber().sendKeys(number);
+		this.commentText.sendKeys(commentText);
+		this.number.sendKeys(number);
 	}
 
 	public void clickAllSelectButton() {
-		getAllSelectButton().click();
+		allSelectButton.click();
 	}
 
 	public void clickSaveButton() {
-		getSaveButton().click();
+		saveButton.click();
+	}
+	
+	public void clickSaveAndReturnButton() {
+		saveAndReturnButton.click();
 	}
 
 	public boolean isCommentTextEmpty() {
-		if(getCommentText().getText().equals("")) {
+		if(commentText.getText().equals("")) {
 			return true;
 		}
 		return false;
 	}
+
+	public boolean isNumberEmpty() {
+		if(number.getText().equals("")) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean selectedCategoriesIsEmpty() {
+		if(listOfSelectedCategories.size() == 0) {
+			System.out.println(listOfSelectedCategories.size());
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isActiveSelected() {
+		if(active.isSelected()) {
+			return true;
+		}
+		return false;
+	}
+}
+
+
+
+package CommentsPages;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+public class CommentsPage {
+	private WebDriver browser;
+
+	private WebElement table;
+	
+	public CommentsPage(WebDriver browser) {
+		this.browser = browser;
+	}
+	
+	public boolean openPage() {
+		
+		
+		return false;
+	}
+	
+	public boolean findCommentInTable(String expectedComment) {
+						
+		table = browser.findElement(By.cssSelector(".webgrid"));
+		
+		if (table.findElements(By.linkText(expectedComment))) {
+			return true;
+			} return false;
+	}
+
+
+
+	
 }
