@@ -13,7 +13,7 @@ public class TC_302 {
 	
 	@Before
 	public void OpenChrome() {
-		System.setProperty("webdriver.chrome.driver", "C:/selenium/chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", "D:/Selenium/chromedriver.exe");
 		browser = new ChromeDriver();
 		browser.manage().window().maximize();
 	}
@@ -41,7 +41,7 @@ public class TC_302 {
 		newCommentPage.clickAllSelectButton();
 		newCommentPage.clickSaveAndReturnButton();
 		
-		Assert.assertTrue(commentsPage.openPage());
+		//Assert.assertTrue(commentsPage.openPage());
 		Assert.assertTrue(commentsPage.findCommentInTable("1TestComment"));
 		Assert.assertTrue(commentsPage.findCommentInTable("2TestComment"));
 	}
@@ -153,8 +153,9 @@ public class NewCommentPage {
 }
 
 
-
 package CommentsPages;
+
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -164,11 +165,13 @@ public class CommentsPage {
 	private WebDriver browser;
 
 	private WebElement table;
+	private List<WebElement> listOfTextColumn;
 	
 	public CommentsPage(WebDriver browser) {
 		this.browser = browser;
 	}
 	
+		
 	public boolean openPage() {
 		
 		
@@ -179,12 +182,17 @@ public class CommentsPage {
 						
 		table = browser.findElement(By.cssSelector(".webgrid"));
 		
-		if (table.findElements(By.linkText(expectedComment))) {
-			return true;
-			} return false;
+		
+		listOfTextColumn = table.findElements(By.className("textcolumn"));
+		boolean found = false;
+			
+		for(WebElement element: listOfTextColumn) {
+			if(element.getText().equals(expectedComment)) {
+				found = true;
+			}
+			System.out.println(element.getText());
+		}
+			
+		return found;
 	}
-
-
-
-	
 }
